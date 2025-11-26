@@ -1,0 +1,26 @@
+{
+  "name": "bookshare",
+  "version": "1.0.0",
+  "description": "Book Sample API",
+  "license": "ISC",
+  "author": "Anwar",
+  "type": "module",
+  "main": "src/main.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.2.1",
+    "joi": "^18.0.2",
+    "uuid": "^13.0.0",
+    "winston": "^3.18.3"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/express": "^5.0.5",
+    "@types/uuid": "^11.0.0",
+    "prisma": "^7.0.1"
+  }
+}
