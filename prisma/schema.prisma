@@ -10,31 +10,71 @@ generator client {
 
 datasource db {
   provider = "mysql"
+  // url      = env("DATABASE_URL")
 }
 
+model User {
+  id        String    @id @default(uuid())
+  email     String    @db.VarChar(100)
+  name      String    @db.VarChar(100)
+  role      Role      @default(CUSTOMER)
+  password  String    @db.VarChar(100)
+  deviceId  String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  carts     Cart[]
 
-model Admin {
-  id        Int      @id @default(autoincrement())
-  email     String   @db.VarChar(100)
-  name      String   @db.VarChar(100)
-  role      String   @db.VarChar(100)
-  password  String   @db.VarChar(100)
-  token     String?  @db.VarChar(100)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("admin")
+  @@map("user")
 }
 
-model Customer {
-  id        Int      @id @default(autoincrement())
-  name      String   @db.VarChar(100)
-  password  String   @db.VarChar(100)
-  role      String   @db.VarChar(100)
-  email     String   @db.VarChar(100)
-  token     String?  @db.VarChar(100)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum Role {
+  ADMIN
+  CUSTOMER
+}
 
-  @@map("customer")
+model Cart {
+  id           String        @id @default(uuid())
+  cartItems    CartItem[]
+  userId       String
+  user         User          @relation(fields: [userId], references: [id])
+  transactions Transactions?
+
+  @@map("cart")
+}
+
+model CartItem {
+  id       String @id @default(uuid())
+  bookId   String
+  cartId   String
+  quantity Int
+  cart     Cart   @relation(fields: [cartId], references: [id])
+
+  @@map("cartItem")
+}
+
+model Books {
+  id          String @id @default(uuid())
+  name        String @db.VarChar(100)
+  price       Int
+  stock       Int
+  description String @db.VarChar(300)
+
+  @@map("books")
+}
+
+model Transactions {
+  id     String             @id @default(uuid())
+  status StatusTransactions @default(PENDING)
+  userId String
+  cartId String             @unique
+  cart   Cart               @relation(fields: [cartId], references: [id])
+  price  Int
+
+  @@map("transactions")
+}
+
+enum StatusTransactions {
+  SUCCESS
+  FAILED
+  PENDING
 }

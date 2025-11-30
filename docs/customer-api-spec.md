@@ -3,7 +3,7 @@
 ## 1. Get Books List
 **Endpoint:** `GET /api/books`
 
-**Description:** Melihat daftar buku yang ready stock
+**Description:** Melihat daftar buku yang ready stock (stock > 0).
 
 **Query Parameters:**
 - `page` (optional): integer, default 1
@@ -17,7 +17,7 @@
   "data": {
     "books": [
       {
-        "id": "string",
+        "id": "number",
         "title": "string",
         "author": "string",
         "price": "number",
@@ -39,14 +39,14 @@
 ## 2. Get Book Detail
 **Endpoint:** `GET /api/books/:id`
 
-**Description:** Melihat detail buku
+**Description:** Melihat detail buku.
 
 **Response 200:**
 ```json
 {
   "status": "success",
   "data": {
-    "id": "string",
+    "id": "number",
     "title": "string",
     "author": "string",
     "description": "string",
@@ -70,10 +70,42 @@
 
 ---
 
-## 3. Add Book to Cart
-**Endpoint:** `POST /api/cart/items`
+## 3. Get Cart
+**Endpoint:** `GET /api/cart`
 
-**Description:** Menambahkan buku ke keranjang (hanya jika stok mencukupi)
+**Description:** Melihat isi keranjang belanja user saat ini.
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Response 200:**
+```json
+{
+  "status": "success",
+  "data": {
+    "id": "number",
+    "items": [
+      {
+        "id": "number",
+        "book_id": "number",
+        "book_title": "string",
+        "quantity": "number",
+        "price": "number",
+        "total_price": "number"
+      }
+    ],
+    "total_items": "number",
+    "total_amount": "number"
+  }
+}
+```
+
+---
+
+## 4. Add Book to Cart
+**Endpoint:** `POST /api/cart`
+
+**Description:** Menambahkan buku ke keranjang. Jika buku sudah ada, quantity akan ditambahkan.
 
 **Headers:**
 - `Authorization: Bearer <token>`
@@ -81,19 +113,19 @@
 **Request Body:**
 ```json
 {
-  "book_id": "string",
+  "book_id": "number",
   "quantity": "number"
 }
 ```
 
-**Response 201:**
+**Response 200:**
 ```json
 {
   "status": "success",
   "message": "Buku berhasil ditambahkan ke keranjang",
   "data": {
-    "cart_item_id": "string",
-    "book_id": "string",
+    "id": "number",
+    "book_id": "number",
     "quantity": "number"
   }
 }
@@ -109,10 +141,10 @@
 
 ---
 
-## 4. Remove Book from Cart
-**Endpoint:** `DELETE /api/cart/items/:id`
+## 5. Remove Book from Cart
+**Endpoint:** `DELETE /api/cart/:itemId`
 
-**Description:** Menghapus buku dari keranjang
+**Description:** Menghapus item dari keranjang.
 
 **Headers:**
 - `Authorization: Bearer <token>`
@@ -121,7 +153,7 @@
 ```json
 {
   "status": "success",
-  "message": "Buku berhasil dihapus dari keranjang"
+  "message": "Item berhasil dihapus dari keranjang"
 }
 ```
 
@@ -135,10 +167,10 @@
 
 ---
 
-## 5. Checkout
-**Endpoint:** `POST /api/orders/checkout`
+## 6. Checkout
+**Endpoint:** `POST /api/checkout`
 
-**Description:** Melakukan checkout untuk pembayaran
+**Description:** Melakukan checkout semua item di keranjang. Mengurangi stok buku dan membuat transaksi pending.
 
 **Headers:**
 - `Authorization: Bearer <token>`
@@ -146,13 +178,7 @@
 **Request Body:**
 ```json
 {
-  "payment_method": "string",
-  "shipping_address": {
-    "street": "string",
-    "city": "string",
-    "postal_code": "string",
-    "phone": "string"
-  }
+  "payment_method": "string"
 }
 ```
 
@@ -162,10 +188,10 @@
   "status": "success",
   "message": "Checkout berhasil",
   "data": {
-    "order_id": "string",
+    "transaction_id": "number",
     "total_amount": "number",
-    "payment_url": "string",
-    "payment_status": "pending"
+    "status": "pending",
+    "created_at": "datetime"
   }
 }
 ```
@@ -174,24 +200,23 @@
 ```json
 {
   "status": "error",
-  "message": "Keranjang kosong atau stok tidak mencukupi"
+  "message": "Keranjang kosong atau stok salah satu buku tidak mencukupi"
 }
 ```
 
 ---
 
-## 6. Payment Callback
-**Endpoint:** `POST /api/payments/callback`
+## 7. Payment Callback
+**Endpoint:** `POST /api/callback/payment`
 
-**Description:** API callback untuk menyimpan status pembayaran dari payment gateway
+**Description:** Webhook untuk menerima status pembayaran dari Payment Gateway.
 
 **Request Body:**
 ```json
 {
   "order_id": "string",
-  "payment_status": "success | failed | pending",
-  "transaction_id": "string",
-  "paid_at": "datetime"
+  "status": "success | failed | pending",
+  "signature": "string"
 }
 ```
 
@@ -200,14 +225,6 @@
 {
   "status": "success",
   "message": "Status pembayaran berhasil diupdate"
-}
-```
-
-**Response 404:**
-```json
-{
-  "status": "error",
-  "message": "Order tidak ditemukan"
 }
 ```
 

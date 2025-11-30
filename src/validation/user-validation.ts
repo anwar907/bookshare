@@ -6,6 +6,8 @@ export class UserValidation {
         name: z.string().min(1).max(100),
         email: z.string().min(1).max(100),
         password: z.string().min(1).max(100),
-        role: z.string().min(1).max(100)
+        role: z.enum(['ADMIN', 'CUSTOMER']),
+        // createdAt: z.date(),
+        // updatedAt: z.date(),
     });
 }

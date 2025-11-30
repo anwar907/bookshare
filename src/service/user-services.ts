@@ -7,13 +7,13 @@ import { Validation } from "../validation/validation";
 
 export class UserServices {
 
-    static async customerRegister(request: CreateUserRequest): Promise<UserResponse> {
+    static async userRegister(request: CreateUserRequest): Promise<UserResponse> {
         const registerRequest = Validation.validate<CreateUserRequest>(UserValidation.REGISTER, request);
 
     
-        const customerUserWithSameEmail = await prismaClient.customer.count({
+        const customerUserWithSameEmail = await prismaClient.user.count({
             where: {
-                email: registerRequest.email,
+                email: registerRequest.email
             }
         });
 
@@ -21,42 +21,20 @@ export class UserServices {
             throw new ResponseError(400, "Email already exists");
         }
 
-        if(registerRequest.role != "customer"){
-            throw new ResponseError(400, "Role must be customer");
-        }
-
         registerRequest.password = await bcrypt.hash(registerRequest.password, 10);
 
-        const user = await prismaClient.customer.create({
-            data: registerRequest
-        });
-
-        return toUserResponse(user)
-    }
-
-    static async adminRegister(request: CreateUserRequest): Promise<UserResponse> {
-        const registerRequest = Validation.validate<CreateUserRequest>(UserValidation.REGISTER, request);
-
-         const adminUserWithSameEmail = await prismaClient.admin.count({
-            where: {
-                email: registerRequest.email
+        const user = await prismaClient.user.create({
+            data: {
+                email: registerRequest.email,
+                name: registerRequest.name,
+                password: registerRequest.password,
+                role: registerRequest.role,
+                deviceId: ""
             }
         });
 
-        if(adminUserWithSameEmail != 0){
-            throw new ResponseError(400, "Email already exists");
-        }
-
-        if(registerRequest.role != "admin"){
-            throw new ResponseError(400, "Role must be admin");
-        }
-
-        registerRequest.password = await bcrypt.hash(registerRequest.password, 10);
-
-        const user = await prismaClient.admin.create({
-            data: registerRequest
-        });
-
         return toUserResponse(user)
     }
+
+    
 }
