@@ -7,7 +7,13 @@ export class UserValidation {
         email: z.string().min(1).max(100),
         password: z.string().min(1).max(100),
         role: z.enum(['ADMIN', 'CUSTOMER']),
-        // createdAt: z.date(),
-        // updatedAt: z.date(),
     });
+
+    static readonly LOGIN: ZodType<CreateUserRequest> = z.object({
+        email: z.string().min(1).max(100),
+        password: z.string().min(1).max(100),
+        role: z.enum(['ADMIN', 'CUSTOMER']),
+        deviceId: z.string().min(1).max(100),
+        name: z.string().min(1).max(100),
+    })
 }

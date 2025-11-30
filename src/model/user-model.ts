@@ -14,14 +14,16 @@ export type CreateUserRequest = {
     email: string;
     password: string;
     role: Role;
+    deviceId?: string;
 }
 
-export function toUserResponse(user: User): UserResponse {
+export function toUserResponse(user: User, token?: string): UserResponse {
     return {
         name: user.name,
         email: user.email,
         role: user.role,
         id: user.id,
         createdAt: user.createdAt,
+        token: token
     }
 }
