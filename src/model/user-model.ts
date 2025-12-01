@@ -17,6 +17,12 @@ export type CreateUserRequest = {
     deviceId?: string;
 }
 
+export type LogoutUserRequest = {
+    token: string;
+    deviceId: string;
+    userId: string;
+}
+
 export function toUserResponse(user: User, token?: string): UserResponse {
     return {
         name: user.name,

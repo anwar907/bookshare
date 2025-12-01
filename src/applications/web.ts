@@ -1,6 +1,6 @@
 import express from 'express';
 import { errorMidleware } from '../middleware/error-middleware';
-import { publicRouter } from '../router/public-api';
+import { publicRouter } from '../router/route-api';
 
 export const web = express();
 web.use(express.json());

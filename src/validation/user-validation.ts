@@ -1,5 +1,5 @@
 import { ZodType, z } from "zod";
-import type { CreateUserRequest } from "../model/user-model";
+import type { CreateUserRequest, LogoutUserRequest } from "../model/user-model";
 
 export class UserValidation {
     static readonly REGISTER: ZodType<CreateUserRequest> = z.object({
@@ -15,5 +15,11 @@ export class UserValidation {
         role: z.enum(['ADMIN', 'CUSTOMER']),
         deviceId: z.string().min(1).max(100),
         name: z.string().min(1).max(100),
-    })
+    });
+
+    static readonly LOGOUT: ZodType<LogoutUserRequest> = z.object({
+        token: z.string().min(1).max(100),
+        deviceId: z.string().min(1).max(100),
+        userId: z.string().min(1).max(100),
+    });
 }
